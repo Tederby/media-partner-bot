@@ -20,8 +20,9 @@ Jika kamu belum pernah menulis kode atau tidak paham programming, tenang saja! I
 3. **Membuka Terminal / CMD:**
    - Di dalam folder proyek, klik di bilah alamat (*address bar*) File Explorer paling atas.
    - Ketik `cmd` lalu tekan **Enter**. Jendela layar hitam (Terminal) akan muncul.
+   - Atau klik kanan dan klik *Open in Terminal* ("Buka di Terminal")
 4. **Install Modul Bot:**
-   - Di layar hitam tersebut, ketikkan perintah berikut dan tekan **Enter**:
+   - Di Command Prompt atau Terminal tersebut, ketikkan perintah berikut dan tekan **Enter**:
      ```bash
      npm install
      ```
