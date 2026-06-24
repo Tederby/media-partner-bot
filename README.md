@@ -1,56 +1,75 @@
-# Instagram Media Partner Bot (Node.js Playwright)
+# 🤖 Instagram Media Partner Bot (Node.js)
 
-Bot otomatisasi berbasis Node.js dan Playwright untuk melakukan tugas Follow akun & Like postingan sesuai dengan target Media Partner yang ada di file.
+Bot otomatisasi ini dibuat agar kamu tidak perlu lagi menekan tombol "Follow" dan "Like" satu per satu secara manual untuk syarat Media Partner. Cukup jalankan bot ini, biarkan browser bekerja secara ajaib di layarmu, dan semua bukti *screenshot* akan tersusun rapi di dalam folder!
 
-> 🔒 **Aman & Privat:** Script ini berjalan secara lokal menggunakan Chromium/Edge dari Playwright dengan *Persistent Context*. Sesi login hanya tersimpan di komputermu sendiri (di folder `sessions/`). Tidak perlu memberikan password kepada siapapun.
+> 🔒 **100% Aman & Privat:** Bot ini beroperasi langsung di laptop/PC-mu menggunakan browser bawaan. Akunmu hanya menyentuh komputermu sendiri (tanpa dikirim ke server orang lain). Tidak ada yang meminta atau mengetahui *password*-mu!
 
-## Persiapan (Setup)
+---
 
-1. Pastikan sudah menginstal **Node.js** (versi LTS terbaru direkomendasikan).
-2. Install dependensi bot:
+## 🛠️ Langkah 1: Persiapan (Hanya Sekali)
+
+Jika kamu belum pernah menulis kode atau tidak paham programming, tenang saja! Ikuti langkah perlahan ini:
+
+1. **Install Node.js (Wajib):**
+   - Buka browser dan pergi ke: [https://nodejs.org/](https://nodejs.org/)
+   - Download tombol hijau yang bertuliskan **"LTS"** (contoh: *v20.x.x LTS*).
+   - Buka file yang sudah didownload, lalu install seperti biasa (klik *Next, Next, Install* sampai selesai).
+2. **Download Proyek Ini:**
+   - Download file proyek ini (atau `git clone` jika kamu paham Git).
+   - Ekstrak foldernya, dan masuk ke folder tersebut.
+3. **Membuka Terminal / CMD:**
+   - Di dalam folder proyek, klik di bilah alamat (*address bar*) File Explorer paling atas.
+   - Ketik `cmd` lalu tekan **Enter**. Jendela layar hitam (Terminal) akan muncul.
+4. **Install Modul Bot:**
+   - Di layar hitam tersebut, ketikkan perintah berikut dan tekan **Enter**:
+     ```bash
+     npm install
+     ```
+   - Tunggu sampai proses download selesai.
+
+---
+
+## ⚙️ Langkah 2: Atur Akun & Target
+
+Semua pengaturan ada di dalam folder `config/`.
+
+1. **Akun Kamu:** Buka file `config/daftar_akun.json` (bisa pakai Notepad). Ganti tulisan `afiffatin_06` (atau yang ada di situ) dengan **username Instagram kamu sendiri**.
+2. **Target Media Partner:** Buka file `config/target_medpart.json`. Di situlah daftar akun-akun yang akan di-follow dan di-like. Formatnya biarkan sama, kamu hanya perlu mengubah bagian `"username"` dan `"like_count"` sesuai kebutuhan medpart-mu.
+
+---
+
+## 🔑 Langkah 3: Mengamankan Login (Cukup Sekali)
+
+Agar kamu tidak perlu login berkali-kali setiap kali bot jalan, kita akan menyuruh bot menyimpan sesi login-mu secara aman di laptopmu.
+
+1. Buka kembali Terminal/CMD (Langkah 1).
+2. Ketik perintah ini dan tekan **Enter**:
    ```bash
-   npm install
+   npm run session
    ```
-3. Install browser engine bawaan Playwright (jika gagal memakai Edge bawaan):
+3. Sebuah browser baru (Edge/Chrome) akan muncul.
+4. **Login ke Instagram** di browser tersebut (masukkan username & password).
+5. Setelah berhasil masuk ke Beranda (Feed), **TUTUP (silang X) jendela browser tersebut**.
+6. Selesai! Bot sudah berhasil menyimpan sesimu.
+
+---
+
+## 🚀 Langkah 4: Jalankan Botnya!
+
+Setelah sesi aman, kamu tinggal santai dan membiarkan bot bekerja.
+
+1. Di Terminal/CMD, ketik:
    ```bash
-   npx playwright install chromium
+   npm start
    ```
+2. Tekan **Enter**.
+3. Lepas mouse-mu! Browser akan terbuka sendiri, menuju profil-profil target satu per satu, mengklik Follow, mengklik Like, dan otomatis **mengambil Screenshot**.
 
-## Konfigurasi
+> **Di mana letak Screenshotnya?**
+> Coba lihat di dalam folder proyekmu, akan muncul folder baru bernama **`Bukti instagram`**. Semua fotomu sudah tersusun rapi dengan format nama yang jelas!
 
-Semua konfigurasi berada di folder `config/`.
+---
 
-1. Buka `config/daftar_akun.json`, ganti `username` dengan nama akun Instagram-mu.
-2. Buka `config/target_medpart.json`, isi daftar target akun yang harus difollow dan dilike (sesuai persyaratan).
-
-## Cara Penggunaan
-
-Ada dua tahap dalam menjalankan bot ini:
-
-### Tahap 1: Generate Sesi Login (Cukup Sekali)
-
-Tahap ini bertujuan untuk login dan menyimpan sesi agar bot tidak perlu login berulang-ulang nantinya.
-
-```bash
-npm run session
-```
-- Browser akan terbuka, dan mengarah ke Instagram.
-- **Login secara manual** seperti biasa.
-- Setelah berhasil masuk ke beranda (Feed), **tutup browser secara manual**.
-- Script akan menyimpan sesi tersebut ke dalam folder `sessions/`.
-
-### Tahap 2: Menjalankan Bot Utama
-
-Setelah punya sesi login, kamu bisa langsung melepas bot ini bekerja otomatis.
-
-```bash
-npm start
-```
-
-- Bot akan me-loop seluruh target medpart di `target_medpart.json`.
-- Mencari profil, mengeklik *Follow*, dan *Like*.
-- Mengambil **Screenshot** bukti dan menyimpannya secara rapi di dalam folder `Bukti instagram/[akun-kamu]/[nama-medpart]/`.
-
-## Catatan Penting
-- **Anti-Spam:** Bot ini dirancang dengan *random delay* antara 10-30 detik setiap melakukan klik (Follow/Like) agar aktivitasnya terlihat natural dan menghindari deteksi spam dari Instagram.
-- Folder `sessions/` dan `Bukti instagram/` akan otomatis terbuat saat bot dijalankan.
+### 💡 Catatan Penting
+* Jeda (*delay*) antara klik saat ini diatur menjadi **3 hingga 7 detik** secara acak agar terlihat seperti manusia asli dan tidak terdeteksi *spam* oleh Instagram.
+* Dilarang menjalankan perintah ini saat kamu sedang nge-klik sana-sini di profil yang sama, biarkan bot yang mengendalikan layarnya.

@@ -117,26 +117,23 @@ async function processBot() {
           }
 
           // --- PROSES FOLLOW ---
-          const buttons = await page.locator("button").all();
           let followBtn = null;
           let alreadyFollowing = false;
 
-          for (const btn of buttons) {
-            try {
-              if (!(await btn.isVisible())) continue;
-              const text = (await btn.innerText()).trim().toLowerCase();
-              if (!text) continue;
-
-              if (["follow", "ikuti", "follow back", "ikuti balik"].includes(text)) {
-                followBtn = btn;
-                break;
-              } else if (["following", "mengikuti", "requested", "diminta"].includes(text)) {
+          try {
+             // Deteksi "Sudah Follow" (Following/Mengikuti/Requested)
+             const followingLocators = page.locator("button, div[role='button']").filter({ hasText: /^(Following|Mengikuti|Requested|Diminta)$/i });
+             if (await followingLocators.count() > 0 && await followingLocators.first().isVisible()) {
                 alreadyFollowing = true;
-                break;
-              }
-            } catch (err) {
-              continue;
-            }
+             } else {
+                // Deteksi tombol "Follow"
+                const followLocators = page.locator("button, div[role='button']").filter({ hasText: /^(Follow|Ikuti|Follow Back|Ikuti Balik)$/i });
+                if (await followLocators.count() > 0 && await followLocators.first().isVisible()) {
+                   followBtn = followLocators.first();
+                }
+             }
+          } catch (err) {
+             console.log(`[${namaMedpart}] Error saat mencari elemen Follow:`, err.message);
           }
 
           const safeTargetUsername = sanitizeFilename(targetUsername);
@@ -149,7 +146,18 @@ async function processBot() {
           } else if (followBtn) {
              console.log(`[${namaMedpart}] Menemukan tombol Follow. Mengklik...`);
              await followBtn.click();
-             await randomDelay(10, 30);
+             
+             // --- VERIFIKASI FOLLOW ---
+             try {
+                console.log(`[${namaMedpart}] Menunggu verifikasi Follow (perubahan tombol)...`);
+                const verifyFollowing = page.locator("button, div[role='button']").filter({ hasText: /^(Following|Mengikuti|Requested|Diminta)$/i }).first();
+                await verifyFollowing.waitFor({ state: 'visible', timeout: 5000 });
+                console.log(`[${namaMedpart}] Berhasil diverifikasi: Status akun sekarang Followed/Requested.`);
+             } catch (e) {
+                console.log(`[${namaMedpart}] [WARNING] Verifikasi Follow timeout. Mengambil screenshot apa adanya.`);
+             }
+
+             await randomDelay(3, 7);
              await page.screenshot({ path: screenshotFollowPath });
              console.log(`[${namaMedpart}] Bukti follow disimpan ke: ${screenshotFollowPath}`);
           } else {
@@ -186,21 +194,14 @@ async function processBot() {
 
                     try {
                        const actionSection = dialog.locator("section").first();
-                       const svgs = await actionSection.locator("svg").all();
+                       
+                       const unlikeSvg = actionSection.locator("svg[aria-label='Unlike'], svg[aria-label='Batal suka']").first();
+                       const likeSvg = actionSection.locator("svg[aria-label='Like'], svg[aria-label='Suka']").first();
 
-                       for (const svg of svgs) {
-                         if (!(await svg.isVisible())) continue;
-                         const label = await svg.getAttribute("aria-label");
-                         if (!label) continue;
-
-                         const labelLower = label.toLowerCase();
-                         if (["like", "suka", "sukai"].includes(labelLower)) {
-                           likeBtn = svg;
-                           break;
-                         } else if (["unlike", "batal suka", "batal sukai"].includes(labelLower)) {
-                           alreadyLiked = true;
-                           break;
-                         }
+                       if (await unlikeSvg.isVisible()) {
+                         alreadyLiked = true;
+                       } else if (await likeSvg.isVisible()) {
+                         likeBtn = likeSvg;
                        }
                     } catch (err) {
                        console.log(`[${namaMedpart}] Error mencari tombol like: ${err.message}`);
@@ -214,9 +215,19 @@ async function processBot() {
                     } else if (likeBtn) {
                       console.log(`[${namaMedpart}] Menyukai postingan ke-${i+1}...`);
                       await likeBtn.click();
-                      await page.waitForTimeout(2500); // Wajib tunggu animasi love
+
+                      // --- VERIFIKASI LIKE ---
+                      try {
+                        console.log(`[${namaMedpart}] Menunggu animasi Like dan verifikasi (perubahan ikon)...`);
+                        const verifyUnlikeSvg = dialog.locator("section").first().locator("svg[aria-label='Unlike'], svg[aria-label='Batal suka']").first();
+                        await verifyUnlikeSvg.waitFor({ state: 'visible', timeout: 5000 });
+                        console.log(`[${namaMedpart}] Berhasil diverifikasi: Postingan telah di-like.`);
+                      } catch (e) {
+                        console.log(`[${namaMedpart}] [WARNING] Verifikasi Like timeout. Mengambil screenshot apa adanya.`);
+                      }
+
                       await page.screenshot({ path: screenshotLikePath });
-                      await randomDelay(10, 30);
+                      await randomDelay(3, 7);
                     } else {
                       console.log(`[${namaMedpart}] Tombol Like tidak ditemukan pada postingan ke-${i+1}.`);
                       await page.screenshot({ path: screenshotLikePath });
